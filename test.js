@@ -44,6 +44,7 @@ function end() {
     }
 }
 
+assertEqual(cityhash.hash64hex('Hello'), '5b8b097366f36e1a', 'cityhash64hex');
 assertEqual('6596376470467341850', cityhash.stringify({low:1727229466, high:1535838579}), 'Stringify for uint64 object');
 assertEqual({low:1727229466, high:1535838579, uint64:true}, cityhash.objectify('6596376470467341850'), 'Objectify for uint64 hash string');
 
