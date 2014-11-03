@@ -76,6 +76,9 @@ npm install cityhash
 
     var cityhash = require('node-cityhash');
     var hash;
+    
+    hash = cityhash.hash64hex('Hello');
+    // hash = '5b8b097366f36e1a'
 
     hash = cityhash.stringify({low:1727229466, high:1535838579});
     // hash = '6596376470467341850'

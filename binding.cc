@@ -261,6 +261,45 @@ node_CityHash64(const Arguments& args) {
 }
 
 Handle<Value>
+node_CityHash64hex(const Arguments& args) {
+    HandleScope scope;
+
+    int args_len = args.Length();
+    if(args_len == 0 || args_len > 3) {
+        return ThrowException(String::New("Invalid arguments."));
+    }
+
+    String::Utf8Value data(args[0]->ToString());
+    const char* str = *data;
+    size_t len = data.length();
+
+    if (Buffer::HasInstance(args[0])) {
+      Local<Object> obj = args[0]->ToObject();
+      str = Buffer::Data(obj);
+      len = Buffer::Length(obj);
+    }
+
+    uint64 hash;
+
+    if(args_len == 1) {
+        hash = CityHash64(str, len);
+    } else if(args_len == 2) {
+        uint64 seed = to_uint64(args[1]);
+
+        hash = CityHash64WithSeed(str, len, seed);
+    } else if(args_len == 3) {
+        uint64 seed0 = to_uint64(args[1]);
+        uint64 seed1 = to_uint64(args[2]);
+        hash = CityHash64WithSeeds(str, len, seed0, seed1);
+    }
+
+    char buffer[MAX_64_HASH_LEN];
+    sprintf(buffer, "%16llx", hash);
+
+    return scope.Close(String::New(buffer));
+}
+
+Handle<Value>
 node_CityHash128(const Arguments& args) {
     HandleScope scope;
 
@@ -387,6 +426,7 @@ init (Handle<Object> target) {
     target->Set(String::New("stringify"), FunctionTemplate::New(node_Stringify)->GetFunction());
     target->Set(String::New("objectify"), FunctionTemplate::New(node_Objectify)->GetFunction());
     target->Set(String::New("hash64"), FunctionTemplate::New(node_CityHash64)->GetFunction());
+    target->Set(String::New("hash64hex"), FunctionTemplate::New(node_CityHash64hex)->GetFunction());
     target->Set(String::New("hash128"), FunctionTemplate::New(node_CityHash128)->GetFunction());
     target->Set(String::New("crc128"), FunctionTemplate::New(node_CityHashCrc128)->GetFunction());
     target->Set(String::New("crc256"), FunctionTemplate::New(node_CityHashCrc256)->GetFunction());
